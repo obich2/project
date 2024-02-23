@@ -4,8 +4,8 @@ class Button:
         self.y_pos = pos[1]
         self.font = font
         self.base_color, self.hovering_color = base_color, hovering_color
-        self.text = text
-        self.text = self.font.render(self.text, True, self.base_color)
+        self.t = text
+        self.text = self.font.render(self.t, True, self.base_color)
         self.rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
         self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
 
@@ -13,12 +13,13 @@ class Button:
         screen.blit(self.text, self.text_rect)
 
     def change_color(self, position):
-        if self.rect.left <= position[0] <= self.rect.right and self.rect.bottom <= position[1] <= self.rect.top:
-            self.text = self.font.render(self.text, True, self.hovering_color)
+        if position[0] not in range(self.rect.left, self.rect.right) or position[1] not in range(self.rect.top,
+                                                                                                 self.rect.bottom):
+            self.text = self.font.render(self.t, True, self.base_color)
         else:
-            self.text = self.font.render(self.text, True, self.base_color)
+            self.text = self.font.render(self.t, True, self.hovering_color)
 
     def check_click(self, position):
-        if self.rect.left <= position[0] <= self.rect.right and self.rect.bottom <= position[1] <= self.rect.top:
+        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
             return True
         return False
