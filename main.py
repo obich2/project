@@ -1,5 +1,7 @@
 import pygame as pg
 from settings import *
+from character import *
+from blocks import *
 import pygame.display
 import time
 import sys
@@ -26,6 +28,7 @@ def get_font(size):
 
 
 block_image = pg.image.load('tiles/block.png')
+
 
 TILE_SIZE = block_image.get_width()
 print(TILE_SIZE)
@@ -93,6 +96,7 @@ def main_menu():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
+
                 if play_button.check_click(mouse_pos):
                     play()
                 if settings_button.check_click(mouse_pos):
@@ -105,6 +109,14 @@ def main_menu():
 
 def play():
     display.fill((146, 244, 255))
+    hero = Character(160, 80)  # создаем героя по (x,y) координатам
+    left = right = False  # по умолчанию - стоим
+    up = False
+    entities = pygame.sprite.Group()  # Поверхности(стенки, пол и тд)
+    platforms = []  # поверхность
+
+    entities.add(hero)
+    display.fill((146, 244, 255))
     while True:
         mouse_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
@@ -115,9 +127,12 @@ def play():
                 print(row)
                 x = 0
                 for tile in row:
-                    if tile == 0:
-                        print(x, y)
+                    if tile == 1:
+                        pf = Platform(x * 80, y * 45)
+                        entities.add(pf)
+                        platforms.append(pf)
                         display.blit(block_image, (x * 80, y * 45))
+
                     x += 1
                 y += 1
 
@@ -128,7 +143,22 @@ def play():
                 main_menu()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 main_menu()
+            if event.type == KEYDOWN and event.key == K_UP:
+                up = True
+            if event.type == KEYDOWN and event.key == K_LEFT:
+                left = True
+            if event.type == KEYDOWN and event.key == K_RIGHT:
+                right = True
+            if event.type == KEYUP and event.key == K_UP:
+                up = False
+            if event.type == KEYUP and event.key == K_RIGHT:
+                right = False
+            if event.type == KEYUP and event.key == K_LEFT:
+                left = False
+
         sc.blit(display, (0, 0))
+        hero.update(left, right, up, platforms)
+        hero.draw(sc)  # отображение
         pygame.display.update()
 
 
@@ -152,8 +182,7 @@ def settings():
 
 
 pg.init()
-sc = pg.display.set_mode((WIDTH, HEIGHT))
+sc = pg.display.set_mode((1600, 900))
 display = pg.Surface((1600, 900))
-
 
 main_menu()
