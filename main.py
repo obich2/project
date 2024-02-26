@@ -27,32 +27,46 @@ def get_font(size):
     return pg.font.Font("font.ttf", size)
 
 
+pg.init()
+
+sc = pg.display.set_mode((1600, 900))
+display = pg.Surface((1600, 900))
+
+# images
 block_image = pg.image.load('tiles/block.png')
+round_out = pg.image.load('tiles/RoundOut.png').convert_alpha()
 
+# sounds
 
+rotated_round_out = pygame.transform.flip(round_out, True, False)
 TILE_SIZE = block_image.get_width()
 print(TILE_SIZE)
 flag = True
 
+pygame.mixer.music.set_volume(0.1)
+
 
 def main_menu():
     global flag
+    pygame.mixer.music.load('sound/Voicer/menu@game_title.ogg')
+
     while flag:
+        pygame.mixer.music.play(1)
         print(flag)
         sc.fill('black')
         first = TextLine(sc, 100, 'MOVE', (800, 450), 'WHITE')
-        # fourth = TextLine(sc, 20, 'press any button to START', (800, 800), 'GREY')
-        # fourth.draw()
+        fourth = TextLine(sc, 20, 'press any button to START', (800, 800), 'GREY')
+        fourth.draw()
         first.draw()
         pg.display.update()
 
-        time.sleep(2)
+        time.sleep(0.75)
 
         sc.fill('black')
         second = TextLine(sc, 100, 'OR', (800, 450), 'WHITE')
         second.draw()
-        # fifth = TextLine(sc, 20, 'press any button to START', (800, 800), 'GREY')
-        # fifth.draw()
+        fifth = TextLine(sc, 20, 'press any button to START', (800, 800), 'GREY')
+        fifth.draw()
         pg.display.update()
 
         time.sleep(0.5)
@@ -60,21 +74,21 @@ def main_menu():
         sc.fill('black')
         third = TextLine(sc, 100, 'DIEEE!!!!!', (800, 450), 'RED')
         third.draw()
-        pg.display.update()
-        time.sleep(0.5)
-
         six = TextLine(sc, 20, 'press any button to START', (800, 800), 'GREY')
         six.draw()
+        pg.display.update()
+        time.sleep(0.5)
         pg.display.update()
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 pg.quit()
                 sys.exit()
-            if event.type != pg.QUIT:
+            if event.type == KEYDOWN:
                 flag = False
+        time.sleep(5)
 
-        time.sleep(0.5)
-
+    main_menu_sound = pygame.mixer.music.load('sound/Music/MainMenuLoop.ogg')
+    pygame.mixer.music.play(-1)
     while True:
         sc.fill('black')
 
@@ -132,7 +146,16 @@ def play():
                         entities.add(pf)
                         platforms.append(pf)
                         display.blit(block_image, (x * 80, y * 45))
-
+                    if tile == 2:
+                        pf = Platform(x * 80, y * 45)
+                        entities.add(pf)
+                        platforms.append(pf)
+                        display.blit(round_out, (x * 80, y * 45))
+                    if tile == 3:
+                        pf = Platform(x * 80, y * 45)
+                        entities.add(pf)
+                        platforms.append(pf)
+                        display.blit(rotated_round_out, (x * 80, y * 45))
                     x += 1
                 y += 1
 
@@ -180,9 +203,5 @@ def settings():
                 if back_button.check_click(mouse_pos):
                     main_menu()
 
-
-pg.init()
-sc = pg.display.set_mode((1600, 900))
-display = pg.Surface((1600, 900))
 
 main_menu()
