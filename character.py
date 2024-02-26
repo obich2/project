@@ -1,3 +1,4 @@
+import pygame
 from pygame import *
 import os
 
@@ -20,7 +21,7 @@ class Character(sprite.Sprite):
         self.V_y = 0  # скорость вертикального перемещения
         self.onGround = False  # опирается ли на что-то персоонаж
         self.rect = Rect(x, y, WIDTH, HEIGHT)  # прямоугольный объект
-        self.image = image.load('tiles/body.png')
+        self.image = pygame.image.load('tiles/body.png').convert_alpha()
 
     def update(self, left, right, up, platforms):
 
