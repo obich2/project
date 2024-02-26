@@ -6,7 +6,7 @@ import pygame.display
 import time
 import sys
 from button import Button
-
+from slider import Slider
 
 class TextLine:
     def __init__(self, screen, font_size, text, position, color):
@@ -43,7 +43,7 @@ TILE_SIZE = block_image.get_width()
 print(TILE_SIZE)
 flag = True
 
-pygame.mixer.music.set_volume(0.1)
+pygame.mixer.music.set_volume(0)
 
 
 def main_menu():
@@ -85,7 +85,6 @@ def main_menu():
                 sys.exit()
             if event.type == KEYDOWN:
                 flag = False
-        time.sleep(5)
 
     main_menu_sound = pygame.mixer.music.load('sound/Music/MainMenuLoop.ogg')
     pygame.mixer.music.play(-1)
@@ -122,7 +121,7 @@ def main_menu():
 
 
 def play():
-    display.fill((146, 244, 255))
+    display.fill((146, 244, 255)) # проверь штуку с дисплеем
     hero = Character(160, 80)  # создаем героя по (x,y) координатам
     left = right = False  # по умолчанию - стоим
     up = False
@@ -186,15 +185,26 @@ def play():
 
 
 def settings():
+    sc.fill('BLACK')
+    sliders = [
+        Slider((800, 450), (100, 60), 10, 0, 100),
+        Slider((800, 550), (500, 60), 10, 0, 100)
+    ]
     while True:
         mouse_pos = pygame.mouse.get_pos()
+        mouse = pygame.mouse.get_pressed()
 
-        sc.fill('BLACK')
         back_button = Button((640, 400),
                              "Back", get_font(75), "#d7fcd4", "White")
         back_button.change_color(mouse_pos)
         back_button.update(sc)
+        for slider in sliders:
+            if slider.slider_rect.collidepoint(mouse_pos) and mouse[0]:
+                slider.move_slider(mouse_pos)
+            slider.draw(sc)
+            print(slider.get_value())
         pygame.display.update()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
