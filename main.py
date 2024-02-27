@@ -110,10 +110,47 @@ def main_menu():
 
 
 def play():
+    # sc.fill('black')
+    # first = TextLine(sc, 100, '5', (800, 450), 'WHITE')
+    # first.draw()
+    # pg.display.update()
+
+    # time.sleep(1)
+
+    # sc.fill('black')
+    # first = TextLine(sc, 100, '4', (800, 450), 'WHITE')
+    # first.draw()
+    # pg.display.update()
+
+    # time.sleep(1)
+
+    # sc.fill('black')
+    # first = TextLine(sc, 100, '3', (800, 450), 'RED')
+    # first.draw()
+    # pg.display.update()
+    
+    # time.sleep(1)
+
+    # sc.fill('black')
+    # first = TextLine(sc, 100, '2', (800, 450), 'RED')
+    # first.draw()
+    # pg.display.update()
+    
+    # time.sleep(1)
+
+    # sc.fill('black')
+    # first = TextLine(sc, 100, '1', (800, 450), 'RED')
+    # first.draw()
+    # pg.display.update()
+    
+    # создание таймера на 1 секунду
+    clock = pygame.time.Clock()
+    counter = 30
+    pygame.time.set_timer(pygame.USEREVENT, 1000)
     display.fill((146, 244, 255))
     # создаем героя по (x,y) координатам
-    hero_1 = Character(200, 50, 'red')
-    hero_2 = Character(1400, 50, 'blue')
+    hero_1 = Character(200, 100, 'red')
+    hero_2 = Character(1400, 100, 'blue')
     hero_1_other = []
     hero_2_other = []
     left_1 = right_1 = False  # по умолчанию - стоим
@@ -127,6 +164,10 @@ def play():
     entities.add(hero_2)
     display.fill((146, 244, 255))
     while True:
+        f = pygame.font.Font(None, 40)
+        timer = f.render(str(counter), True,
+                  (255, 255, 255))
+        display.blit(timer, (800, 800))
         mouse_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
 
@@ -152,7 +193,8 @@ def play():
                 display.blit(image_trace_red, (i[0], i[1]))
             for i in hero_2_other:
                 display.blit(image_trace_blue, (i[0], i[1]))
-
+            if event.type == pygame.USEREVENT: 
+                counter -= 1
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
@@ -184,15 +226,37 @@ def play():
                 right_2 = False
             if event.type == KEYUP and event.key == K_a:
                 left_2 = False
-
-        hero_1_other.append(hero_1.draw_other())
-        hero_2_other.append(hero_2.draw_other())
-        sc.blit(display, (0, 0))
-        hero_1.update(left_1, right_1, up_1, platforms, other)  # отображение
-        hero_2.update(left_2, right_2, up_2, platforms, other)
-        hero_1.draw(sc)
-        hero_2.draw(sc)
-        pygame.display.update()
+        print(len(hero_2_other))
+        print(len(hero_1_other))
+        if counter > 0:
+            r1 = hero_1.draw_other()
+            r2 = hero_2.draw_other()
+            if r1 not in hero_1_other:
+                hero_1_other.append(r1)
+            if r2 not in hero_2_other:
+                hero_2_other.append(r2)
+            sc.blit(display, (0, 0))
+            hero_1.update(left_1, right_1, up_1, platforms, other)  # отображение
+            hero_2.update(left_2, right_2, up_2, platforms, other)
+            hero_1.draw(sc)
+            hero_2.draw(sc)
+            pygame.display.update()
+        else:
+            if len(hero_1_other) > len(hero_2_other):
+                sc.fill('black')
+                first = TextLine(sc, 100, 'RED WIN', (800, 450), 'RED')
+                first.draw()
+                pg.display.update()
+            elif len(hero_2_other) > len(hero_1_other):
+                sc.fill('black')
+                first = TextLine(sc, 100, 'BLUE WIN', (800, 450), 'BLUE')
+                first.draw()
+                pg.display.update()
+            elif len(hero_2_other) == len(hero_1_other):
+                sc.fill('black')
+                first = TextLine(sc, 100, 'draw', (800, 450), 'WHITE')
+                first.draw()
+                pg.display.update()
 
 def settings():
     while True:
