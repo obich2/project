@@ -1,7 +1,15 @@
 WIDTH = 1600
-HEIGHT = 900
+HEIGHT = 9000
 
-#music
+# sound
+MUSIC_VOLUME = 0.1
+EFFECTS_VOLUME = 0.1
+
+
+# def change_volume(music, effects):
+#     global MUSIC_VOLUME, EFFECTS_VOLUME
+#     MUSIC_VOLUME = music
+#     EFFECTS_VOLUME = effects
 
 
 game_map = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],

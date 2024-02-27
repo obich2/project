@@ -8,11 +8,13 @@ import sys
 from button import Button
 from slider import Slider
 
+
 class TextLine:
     def __init__(self, screen, font_size, text, position, color):
         self.screen = screen
         self.font = font_size
         self.text = text
+        self.value = 0
         self.position = position
         self.color = color
         self.rect = ''
@@ -31,11 +33,13 @@ pg.init()
 
 sc = pg.display.set_mode((1600, 900))
 display = pg.Surface((1600, 900))
+pg.display.set_caption('Move or Die')
 
 # images
 block_image = pg.image.load('tiles/block.png')
+app_icon = pg.image.load('tiles/icon.png')
 round_out = pg.image.load('tiles/RoundOut.png').convert_alpha()
-
+pg.display.set_icon(app_icon)
 # sounds
 
 rotated_round_out = pygame.transform.flip(round_out, True, False)
@@ -43,11 +47,10 @@ TILE_SIZE = block_image.get_width()
 print(TILE_SIZE)
 flag = True
 
-pygame.mixer.music.set_volume(0)
-
 
 def main_menu():
     global flag
+    pygame.mixer.music.set_volume(MUSIC_VOLUME)
     pygame.mixer.music.load('sound/Voicer/menu@game_title.ogg')
 
     while flag:
@@ -85,22 +88,25 @@ def main_menu():
                 sys.exit()
             if event.type == KEYDOWN:
                 flag = False
+    pygame.mixer.music.set_volume(EFFECTS_VOLUME)
 
     main_menu_sound = pygame.mixer.music.load('sound/Music/MainMenuLoop.ogg')
     pygame.mixer.music.play(-1)
     while True:
         sc.fill('black')
-
-        play_button = Button((640, 250),
-                             "PLAY", get_font(75), "#d7fcd4", "White")
-        settings_button = Button((640, 400),
-                                 "SETTINGS", get_font(75), "#d7fcd4", "White")
-        quit_button = Button((640, 550),
-                             "QUIT", get_font(75), "#d7fcd4", "White")
-
+        buttons = [
+            Button((800, 230),
+                   "PLAY", get_font(75), "#d7fcd4", "White"),
+            Button((800, 380),
+                   "LEADERBOARDS", get_font(75), "#d7fcd4", "White"),
+            Button((795, 530),
+                   "SETTINGS", get_font(75), "#d7fcd4", "White"),
+            Button((800, 680),
+                   "QUIT", get_font(75), "#d7fcd4", "White")
+        ]
         mouse_pos = pygame.mouse.get_pos()
 
-        for button in [play_button, settings_button, quit_button]:
+        for button in buttons:
             button.change_color(mouse_pos)
             button.update(sc)
 
@@ -110,18 +116,20 @@ def main_menu():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
 
-                if play_button.check_click(mouse_pos):
+                if buttons[0].check_click(mouse_pos):
                     play()
-                if settings_button.check_click(mouse_pos):
+                if buttons[1].check_click(mouse_pos):
+                    leaderboards()
+                if buttons[2].check_click(mouse_pos):
                     settings()
-                if quit_button.check_click(mouse_pos):
+                if buttons[3].check_click(mouse_pos):
                     pygame.quit()
                     sys.exit()
         pygame.display.update()
 
 
 def play():
-    display.fill((146, 244, 255)) # проверь штуку с дисплеем
+    display.fill((146, 244, 255))  # проверь штуку с дисплеем
     hero = Character(160, 80)  # создаем героя по (x,y) координатам
     left = right = False  # по умолчанию - стоим
     up = False
@@ -186,23 +194,38 @@ def play():
 
 def settings():
     sc.fill('BLACK')
+    textlines = [TextLine(sc, 46, '10', (1150, 460), '#d7fcd4'),
+                 TextLine(sc, 46, '10', (1150, 560), '#d7fcd4'),
+                 TextLine(sc, 75, 'SETTINGS', (850, 200), '#d7fcd4'),
+                 TextLine(sc, 46, 'music', (370, 460), '#d7fcd4'),
+                 TextLine(sc, 46, 'effects', (350, 560), '#d7fcd4')]
+    for textline in textlines:
+        textline.draw()
     sliders = [
-        Slider((800, 450), (100, 60), 10, 0, 100),
-        Slider((800, 550), (500, 60), 10, 0, 100)
+        Slider((540, 450), (500, 30), 10, 0, 100),
+        Slider((540, 550), (500, 30), 10, 0, 100)
     ]
     while True:
         mouse_pos = pygame.mouse.get_pos()
         mouse = pygame.mouse.get_pressed()
 
-        back_button = Button((640, 400),
+        back_button = Button((1300, 750),
                              "Back", get_font(75), "#d7fcd4", "White")
         back_button.change_color(mouse_pos)
         back_button.update(sc)
-        for slider in sliders:
+        apply_button = Button((400, 750),
+                              "Apply", get_font(75), "#d7fcd4", "White")
+        apply_button.change_color(mouse_pos)
+        apply_button.update(sc)
+        for index, slider in enumerate(sliders):
             if slider.slider_rect.collidepoint(mouse_pos) and mouse[0]:
                 slider.move_slider(mouse_pos)
             slider.draw(sc)
-            print(slider.get_value())
+            current_textline = textlines[index]
+            current_textline.text = str(int(slider.get_value() // 1))
+            current_textline.value = int(slider.get_value() // 1)
+            sc.fill('black', (current_textline.position[0] - 75, current_textline.position[1] - 30, 150, 75))
+            current_textline.draw()
         pygame.display.update()
 
         for event in pygame.event.get():
@@ -212,6 +235,12 @@ def settings():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if back_button.check_click(mouse_pos):
                     main_menu()
+                if apply_button.check_click(mouse_pos):
+                    pygame.mixer.music.set_volume(textlines[0].value)
+
+
+def leaderboards():
+    pass
 
 
 main_menu()
