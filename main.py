@@ -234,7 +234,7 @@ def play():
             if r1 not in hero_1_other:
                 hero_1_other.append(r1)
             if r2 not in hero_2_other:
-                hero_2_other.appenэd(r2)
+                hero_2_other.append(r2)
             sc.blit(display, (0, 0))
             hero_1.update(left_1, right_1, up_1, platforms, other)  # отображение
             hero_2.update(left_2, right_2, up_2, platforms, other)
