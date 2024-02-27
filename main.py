@@ -110,38 +110,38 @@ def main_menu():
 
 
 def play():
-    # sc.fill('black')
-    # first = TextLine(sc, 100, '5', (800, 450), 'WHITE')
-    # first.draw()
-    # pg.display.update()
+    sc.fill('black')
+    first = TextLine(sc, 100, '5', (800, 450), 'WHITE')
+    first.draw()
+    pg.display.update()
 
-    # time.sleep(1)
+    time.sleep(1)
 
-    # sc.fill('black')
-    # first = TextLine(sc, 100, '4', (800, 450), 'WHITE')
-    # first.draw()
-    # pg.display.update()
+    sc.fill('black')
+    first = TextLine(sc, 100, '4', (800, 450), 'WHITE')
+    first.draw()
+    pg.display.update()
 
-    # time.sleep(1)
+    time.sleep(1)
 
-    # sc.fill('black')
-    # first = TextLine(sc, 100, '3', (800, 450), 'RED')
-    # first.draw()
-    # pg.display.update()
+    sc.fill('black')
+    first = TextLine(sc, 100, '3', (800, 450), 'RED')
+    first.draw()
+    pg.display.update()
     
-    # time.sleep(1)
+    time.sleep(1)
 
-    # sc.fill('black')
-    # first = TextLine(sc, 100, '2', (800, 450), 'RED')
-    # first.draw()
-    # pg.display.update()
+    sc.fill('black')
+    first = TextLine(sc, 100, '2', (800, 450), 'RED')
+    first.draw()
+    pg.display.update()
     
-    # time.sleep(1)
+    time.sleep(1)
 
-    # sc.fill('black')
-    # first = TextLine(sc, 100, '1', (800, 450), 'RED')
-    # first.draw()
-    # pg.display.update()
+    sc.fill('black')
+    first = TextLine(sc, 100, '1', (800, 450), 'RED')
+    first.draw()
+    pg.display.update()
     
     # создание таймера на 1 секунду
     clock = pygame.time.Clock()
