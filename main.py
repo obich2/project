@@ -196,7 +196,7 @@ def settings():
     sc.fill('BLACK')
     textlines = [TextLine(sc, 46, '10', (1150, 460), '#d7fcd4'),
                  TextLine(sc, 46, '10', (1150, 560), '#d7fcd4'),
-                 TextLine(sc, 75, 'SETTINGS', (850, 200), '#d7fcd4'),
+                 TextLine(sc, 75, 'SETTINGS', (800, 200), '#d7fcd4'),
                  TextLine(sc, 46, 'music', (370, 460), '#d7fcd4'),
                  TextLine(sc, 46, 'effects', (350, 560), '#d7fcd4')]
     for textline in textlines:
@@ -240,7 +240,34 @@ def settings():
 
 
 def leaderboards():
-    pass
+    while True:
+        sc.fill('BLACK')
+        textlines = [TextLine(sc, 46, '10', (1150, 460), '#d7fcd4'),
+                     TextLine(sc, 46, '10', (1150, 560), '#d7fcd4'),
+                     TextLine(sc, 75, 'LEADERBOARDS', (800, 200), '#d7fcd4'),
+                     TextLine(sc, 46, 'first record', (400, 300), '#d7fcd4'),
+                     TextLine(sc, 46, 'second record', (400, 400), '#d7fcd4'),
+                     TextLine(sc, 46, 'third record', (400, 500), '#d7fcd4'),
+                     TextLine(sc, 46, 'fourth record', (400, 600), '#d7fcd4'),
+                     TextLine(sc, 46, 'fifth record', (400, 700), '#d7fcd4')]
+        mouse_pos = pygame.mouse.get_pos()
+        mouse = pygame.mouse.get_pressed()
+
+        back_button = Button((1300, 750),
+                             "Back", get_font(75), "#d7fcd4", "White")
+        back_button.change_color(mouse_pos)
+        back_button.update(sc)
+        for textline in textlines:
+            textline.draw()
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if back_button.check_click(mouse_pos):
+                    main_menu()
 
 
 main_menu()
