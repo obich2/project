@@ -190,7 +190,7 @@ def play():
     while True:
         f = pygame.font.Font(None, 40)
         timer = f.render(str(counter), True,
-                  (255, 255, 255))
+                         (255, 255, 255))
         display.blit(timer, (800, 800))
         mouse_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
@@ -206,6 +206,8 @@ def play():
                         entities.add(pf)
                         platforms.append(pf)
                         display.blit(block_image, (x * 80, y * 45))
+                    elif tile == 0:
+                        display.blit(sky_image, (x * 80, y * 45))
                     if tile == 2:
                         pf = Platform(x * 80, y * 45)
                         entities.add(pf)
@@ -219,6 +221,7 @@ def play():
                     x += 1
                 y += 1
             for i in hero_1_other:
+                print('РИСУЕМ')
                 display.blit(image_trace_red, (i[0], i[1]))
             for i in hero_2_other:
                 display.blit(image_trace_blue, (i[0], i[1]))
@@ -255,8 +258,6 @@ def play():
                 right_2 = False
             if event.type == KEYUP and event.key == K_a:
                 left_2 = False
-        print(len(hero_2_other))
-        print(len(hero_1_other))
         if counter > 0:
             r1 = hero_1.draw_other()
             r2 = hero_2.draw_other()
@@ -286,6 +287,7 @@ def play():
                 first = TextLine(sc, 100, 'draw', (800, 450), 'WHITE')
                 first.draw()
                 pg.display.update()
+
 
 def settings():
     sc.fill('BLACK')
