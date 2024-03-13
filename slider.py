@@ -16,6 +16,7 @@ class Slider:
         self.button_rect = pygame.Rect(self.left_pos + self.init_value, self.top_pos, 10, self.size[1])
 
         self.number = self.init_value + self.left_pos
+
     def draw(self, screen):
         pygame.draw.rect(screen, 'blue', self.slider_rect)
         pygame.draw.rect(screen, 'red', self.button_rect)
