@@ -8,39 +8,11 @@ import sys
 import random
 from button import Button
 from slider import Slider
-
-
-class TextLine:
-    def __init__(self, screen, font_size, text, position, color):
-        self.screen = screen
-        self.font = font_size
-        self.text = text
-        self.value = 0
-        self.position = position
-        self.color = color
-        self.rect = ''
-
-    def draw(self):
-        self.text = get_font(self.font).render(self.text, True, self.color)
-        self.rect = self.text.get_rect(center=self.position)
-        self.screen.blit(self.text, self.rect)
-
-
-def get_font(size):
-    return pg.font.Font("font.ttf", size)
-
+from textline import TextLine, get_font
+from music import Game_Music
 
 sc = pg.display.set_mode((1600, 900))
 display = pg.Surface((1600, 900))
-list_of_game_music = ['sound/Music/InGame' + str(i) + 'Loop.ogg' for i in range(1, 10)]
-
-
-def change_to_menu_music():
-    pygame.mixer.music.load('sound/Music/MainMenuLoop.ogg')
-
-
-def change_to_game_music():
-    pygame.mixer.music.load(list_of_game_music[random.randint(1, 9)])
 
 
 class Game:
@@ -50,15 +22,16 @@ class Game:
         display = self.display
         pg.display.set_caption('Move or Die')
         pg.display.set_icon(app_icon)
-        self.current_music = 'sound/Voicer/menu@game_title.ogg'
         self.flag = True
-        pygame.mixer.music.load('sound/Voicer/menu@game_title.ogg')
+        self.menu_flag = True
+        self.game_flag = True
+        self.game_music = Game_Music()
         self.splash_screen()
 
     def splash_screen(self):
         sc = self.sc
         while self.flag:
-            pygame.mixer.music.play(1)
+            self.game_music.play('voicer', 1)
             sc.fill('black')
             first = TextLine(sc, 100, 'MOVE', (800, 450), 'WHITE')
             fourth = TextLine(sc, 20, 'press any button to START', (800, 800), 'GREY')
@@ -90,12 +63,15 @@ class Game:
                     pg.quit()
                     sys.exit()
                 if event.type == KEYDOWN:
+                    self.game_music.stop('voicer')
                     self.flag = False
-        pygame.mixer.music.set_volume(EFFECTS_VOLUME)
+            self.game_music.stop('voicer')
 
     def main_menu(self):
-        change_to_menu_music()
-        pygame.mixer.music.play(-1)
+        if self.menu_flag:
+            self.game_music.change_sound('music', 'menu')
+            self.game_music.play('music', -1)
+            self.menu_flag = False
         while True:
             sc = self.sc
             sc.fill('black')
@@ -122,6 +98,8 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
 
                     if buttons[0].check_click(mouse_pos):
+                        self.game_music.stop('music')
+                        self.menu_flag = True
                         self.play()
                     if buttons[1].check_click(mouse_pos):
                         self.leaderboards()
@@ -167,6 +145,10 @@ class Game:
         first.draw()
         pg.display.update()
 
+        if self.game_flag:
+            self.game_music.change_sound('music', 'game')
+            self.game_music.play('music', -1)
+            self.game_flag = False
         # создание таймера на 1 секунду
         clock = pygame.time.Clock()
         counter = 30
@@ -232,8 +214,10 @@ class Game:
                     sys.exit()
                 if event.type == pygame.K_ESCAPE:
                     self.main_menu()
+                    self.game_music.stop('music')
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     self.main_menu()
+                    self.game_music.stop('music')
                 if event.type == KEYDOWN and event.key == K_UP:
                     up_1 = True
                 if event.type == KEYDOWN and event.key == K_LEFT:
