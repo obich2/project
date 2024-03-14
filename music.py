@@ -9,7 +9,7 @@ music_dict = {
 voicer_dict = {
     'countdown': 'sound/Voicer/game@countdown.ogg',
     'draw': 'sound/Voicer/game@draw.ogg',
-    'go': 'sound/Voicer/agme@go.ogg',
+    'ready_go': 'sound/Voicer/game@go.ogg',
     'time_up': 'sound/Voicer/game@time_up.ogg',
     'blue_win': 'sound/Voicer/menu@blue_final_win.ogg',
     'game_title': 'sound/Voicer/menu@game_title.ogg',
@@ -28,6 +28,7 @@ class Game_Music:
         self.voicer_sound = pygame.mixer.Sound(voicer_dict['game_title'])
         self.music_sound = pygame.mixer.Sound(music_dict['menu'])
         self.effects_sound = ''
+        self.sounds = [self.voicer_sound, self.music_sound, self.effects_sound]
 
     def change_sound(self, sound, sound_name):
         if sound == 'music':
@@ -36,7 +37,7 @@ class Game_Music:
             else:
                 self.music_sound = pygame.mixer.Sound(music_dict['game'][random.randint(0, 8)])
         elif sound == "voicer":
-            self.voicer_sound = pygame.mixer.Sound('')
+            self.voicer_sound = pygame.mixer.Sound(voicer_dict[sound_name])
         else:
             self.effects_sound = pygame.mixer.Sound('')
 
@@ -58,3 +59,7 @@ class Game_Music:
             self.voicer_sound.stop()
         else:
             self.effects_sound.stop()
+
+    def change_volume(self, volume):
+        for sound in self.sounds:
+            sound.set_volume(volume)

@@ -5,7 +5,6 @@ from blocks import *
 import pygame.display
 import time
 import sys
-import random
 from button import Button
 from slider import Slider
 from textline import TextLine, get_font
@@ -33,28 +32,25 @@ class Game:
         while self.flag:
             self.game_music.play('voicer', 1)
             sc.fill('black')
-            first = TextLine(sc, 100, 'MOVE', (800, 450), 'WHITE')
-            fourth = TextLine(sc, 20, 'press any button to START', (800, 800), 'GREY')
-            fourth.draw()
-            first.draw()
+            splash_text = TextLine(sc, 100, 'MOVE', (800, 450), 'WHITE')
+            any_button_text = TextLine(sc, 20, 'press any button to START', (800, 800), 'GREY')
+            any_button_text.draw()
+            splash_text.draw()
             pg.display.update()
-
             time.sleep(0.75)
 
             sc.fill('black')
-            second = TextLine(sc, 100, 'OR', (800, 450), 'WHITE')
-            second.draw()
-            fifth = TextLine(sc, 20, 'press any button to START', (800, 800), 'GREY')
-            fifth.draw()
+            splash_text.change_text('OR')
+            splash_text.draw()
+            any_button_text.draw()
             pg.display.update()
 
             time.sleep(0.5)
 
             sc.fill('black')
-            third = TextLine(sc, 100, 'DIEEE!!!!!', (800, 450), 'RED')
-            third.draw()
-            six = TextLine(sc, 20, 'press any button to START', (800, 800), 'GREY')
-            six.draw()
+            splash_text.change_text('DIEEEEEE', 'RED')
+            splash_text.draw()
+            any_button_text.draw()
             pg.display.update()
             time.sleep(0.5)
             pg.display.update()
@@ -72,6 +68,8 @@ class Game:
             self.game_music.change_sound('music', 'menu')
             self.game_music.play('music', -1)
             self.menu_flag = False
+            self.game_flag = True
+
         while True:
             sc = self.sc
             sc.fill('black')
@@ -99,7 +97,6 @@ class Game:
 
                     if buttons[0].check_click(mouse_pos):
                         self.game_music.stop('music')
-                        self.menu_flag = True
                         self.play()
                     if buttons[1].check_click(mouse_pos):
                         self.leaderboards()
@@ -111,44 +108,28 @@ class Game:
             pygame.display.update()
 
     def play(self):
+        self.game_music.change_sound('voicer', 'countdown')
+        self.game_music.play('voicer', 1)
         sc = self.sc
-        sc.fill('black')
-        first = TextLine(sc, 100, '5', (800, 450), 'WHITE')
-        first.draw()
-        pg.display.update()
-
-        time.sleep(1)
-
-        sc.fill('black')
-        first = TextLine(sc, 100, '4', (800, 450), 'WHITE')
-        first.draw()
-        pg.display.update()
-
-        time.sleep(1)
-
-        sc.fill('black')
-        first = TextLine(sc, 100, '3', (800, 450), 'RED')
-        first.draw()
-        pg.display.update()
-
-        time.sleep(1)
-
-        sc.fill('black')
-        first = TextLine(sc, 100, '2', (800, 450), 'RED')
-        first.draw()
-        pg.display.update()
-
-        time.sleep(1)
-
-        sc.fill('black')
-        first = TextLine(sc, 100, '1', (800, 450), 'RED')
-        first.draw()
-        pg.display.update()
+        before_game_text = ['5', '4', '3', '2', '1', 'READY', 'GO']
+        for text in before_game_text:
+            if text == 'READY':
+                self.game_music.stop('voicer')
+                self.game_music.change_sound('voicer', 'ready_go')
+                self.game_music.play('voicer', 1)
+            sc.fill('black')
+            timer_text = TextLine(sc, 100, text, (800, 450), 'WHITE')
+            timer_text.draw()
+            pg.display.update()
+            time.sleep(1)
+        self.game_music.stop('voicer')
 
         if self.game_flag:
             self.game_music.change_sound('music', 'game')
             self.game_music.play('music', -1)
             self.game_flag = False
+            self.menu_flag = True
+
         # создание таймера на 1 секунду
         clock = pygame.time.Clock()
         counter = 30
@@ -171,9 +152,9 @@ class Game:
         display.fill((146, 244, 255))
         while True:
             f = pygame.font.Font(None, 40)
-            timer = f.render(str(counter), True,
-                             (255, 255, 255))
-            display.blit(timer, (800, 800))
+            timer_text = f.render(str(counter), True,
+                                  (255, 255, 255))
+            display.blit(timer_text, (800, 800))
             mouse_pos = pygame.mouse.get_pos()
             for event in pygame.event.get():
 
@@ -213,11 +194,11 @@ class Game:
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.K_ESCAPE:
-                    self.main_menu()
                     self.game_music.stop('music')
+                    self.main_menu()
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    self.main_menu()
                     self.game_music.stop('music')
+                    self.main_menu()
                 if event.type == KEYDOWN and event.key == K_UP:
                     up_1 = True
                 if event.type == KEYDOWN and event.key == K_LEFT:
@@ -258,18 +239,18 @@ class Game:
             else:
                 if len(hero_1_other) > len(hero_2_other):
                     sc.fill('black')
-                    first = TextLine(sc, 100, 'RED WIN', (800, 450), 'RED')
-                    first.draw()
+                    timer_text = TextLine(sc, 100, 'RED WIN', (800, 450), 'RED')
+                    timer_text.draw()
                     pg.display.update()
                 elif len(hero_2_other) > len(hero_1_other):
                     sc.fill('black')
-                    first = TextLine(sc, 100, 'BLUE WIN', (800, 450), 'BLUE')
-                    first.draw()
+                    timer_text = TextLine(sc, 100, 'BLUE WIN', (800, 450), 'BLUE')
+                    timer_text.draw()
                     pg.display.update()
                 elif len(hero_2_other) == len(hero_1_other):
                     sc.fill('black')
-                    first = TextLine(sc, 100, 'draw', (800, 450), 'WHITE')
-                    first.draw()
+                    timer_text = TextLine(sc, 100, 'draw', (800, 450), 'WHITE')
+                    timer_text.draw()
                     pg.display.update()
 
     def settings(self):
@@ -303,7 +284,7 @@ class Game:
                     slider.move_slider(mouse_pos)
                 slider.draw(sc)
                 current_textline = textlines[index]
-                current_textline.text = str(int(slider.get_value() // 1))
+                current_textline.change_text(str(int(slider.get_value() // 1)))
                 current_textline.value = int(slider.get_value() // 1)
                 sc.fill('black', (current_textline.position[0] - 75, current_textline.position[1] - 30, 150, 75))
                 current_textline.draw()
