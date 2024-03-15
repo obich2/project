@@ -4,6 +4,7 @@ from character import *
 from blocks import *
 import pygame.display
 import time
+import sqlite3
 import sys
 from button import Button
 from slider import Slider
@@ -26,6 +27,7 @@ class Game:
         self.game_flag = True
         self.game_music = Game_Music()
         self.splash_screen()
+        self.con = sqlite3.connect("database/games_db.sqlite")
 
     def splash_screen(self):
         sc = self.sc
@@ -132,7 +134,7 @@ class Game:
 
         # создание таймера на 1 секунду
         clock = pygame.time.Clock()
-        counter = 30
+        counter = 10
         pygame.time.set_timer(pygame.USEREVENT, 1000)
         display.fill((146, 244, 255))
         # создаем героя по (x,y) координатам
@@ -150,7 +152,8 @@ class Game:
         entities.add(hero_1)
         entities.add(hero_2)
         display.fill((146, 244, 255))
-        while True:
+        game_running = True
+        while game_running:
             f = pygame.font.Font(None, 40)
             timer_text = f.render(str(counter), True,
                                   (255, 255, 255))
@@ -181,10 +184,10 @@ class Game:
                             entities.add(pf)
                             platforms.append(pf)
                             display.blit(rotated_round_out, (x * 80, y * 45))
+
                         x += 1
                     y += 1
                 for i in hero_1_other:
-                    print('РИСУЕМ')
                     display.blit(image_trace_red, (i[0], i[1]))
                 for i in hero_2_other:
                     display.blit(image_trace_blue, (i[0], i[1]))
@@ -237,35 +240,51 @@ class Game:
                 hero_2.draw(sc)
                 pygame.display.update()
             else:
+                game_running = False
+                self.game_music.stop('music')
                 if len(hero_1_other) > len(hero_2_other):
                     sc.fill('black')
+                    self.game_music.change_sound('voicer', 'pink_win')
+                    self.game_music.play('voicer', 1)
                     timer_text = TextLine(sc, 100, 'RED WIN', (800, 450), 'RED')
                     timer_text.draw()
                     pg.display.update()
                 elif len(hero_2_other) > len(hero_1_other):
+                    self.game_music.change_sound('voicer', 'blue_win')
+                    self.game_music.play('voicer', 1)
                     sc.fill('black')
                     timer_text = TextLine(sc, 100, 'BLUE WIN', (800, 450), 'BLUE')
                     timer_text.draw()
                     pg.display.update()
                 elif len(hero_2_other) == len(hero_1_other):
+                    self.game_music.change_sound('voicer', 'draw')
+                    self.game_music.play('voicer', 1)
                     sc.fill('black')
                     timer_text = TextLine(sc, 100, 'draw', (800, 450), 'WHITE')
                     timer_text.draw()
                     pg.display.update()
+                    time.sleep(1)
+                    self.game_music.stop('voicer')
+                    self.main_menu()
+
 
     def settings(self):
         sc = self.sc
         sc.fill('BLACK')
-        textlines = [TextLine(sc, 46, '10', (1150, 460), '#d7fcd4'),
-                     TextLine(sc, 46, '10', (1150, 560), '#d7fcd4'),
+        textlines = [TextLine(sc, 46, str(int(self.game_music.voicer_volume * 100)), (1150, 320), '#d7fcd4'),
+                     TextLine(sc, 46, str(int(self.game_music.music_volume * 100)), (1150, 420), '#d7fcd4'),
+                     TextLine(sc, 46, str(int(self.game_music.effects_volume * 100)), (1150, 520), '#d7fcd4'),
                      TextLine(sc, 75, 'SETTINGS', (800, 200), '#d7fcd4'),
-                     TextLine(sc, 46, 'music', (370, 460), '#d7fcd4'),
-                     TextLine(sc, 46, 'effects', (350, 560), '#d7fcd4')]
+                     TextLine(sc, 46, 'voicer', (350, 320), '#d7fcd4'),
+                     TextLine(sc, 46, 'music', (370, 420), '#d7fcd4'),
+                     TextLine(sc, 46, 'effects', (350, 520), '#d7fcd4')
+                     ]
         for textline in textlines:
             textline.draw()
         sliders = [
-            Slider((540, 450), (500, 30), 10, 0, 100),
-            Slider((540, 550), (500, 30), 10, 0, 100)
+            Slider((540, 310), (500, 30), int(self.game_music.voicer_volume * 100), 0, 100),
+            Slider((540, 410), (500, 30), int(self.game_music.music_volume * 100), 0, 100),
+            Slider((540, 510), (500, 30), int(self.game_music.effects_volume * 100), 0, 100)
         ]
         while True:
             mouse_pos = pygame.mouse.get_pos()
@@ -298,9 +317,14 @@ class Game:
                     if back_button.check_click(mouse_pos):
                         self.main_menu()
                     if apply_button.check_click(mouse_pos):
-                        pygame.mixer.music.set_volume(textlines[0].value)
+                        self.game_music.change_volume('voicer', textlines[0].value / 100)
+                        self.game_music.change_volume('music', textlines[1].value / 100)
+                        # self.game_music.change_volume('effects', textlines[2].value / 100)
 
     def leaderboards(self):
+        cur = self.con.cursor()
+        result = cur.execute("""SELECT score FROM stats""").fetchall()
+        print(result)
         sc = self.sc
         while True:
             sc.fill('BLACK')
@@ -310,8 +334,7 @@ class Game:
                          TextLine(sc, 46, 'first record', (400, 300), '#d7fcd4'),
                          TextLine(sc, 46, 'second record', (400, 400), '#d7fcd4'),
                          TextLine(sc, 46, 'third record', (400, 500), '#d7fcd4'),
-                         TextLine(sc, 46, 'fourth record', (400, 600), '#d7fcd4'),
-                         TextLine(sc, 46, 'fifth record', (400, 700), '#d7fcd4')]
+                         ]
             mouse_pos = pygame.mouse.get_pos()
             mouse = pygame.mouse.get_pressed()
 

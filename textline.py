@@ -15,7 +15,6 @@ class TextLine:
     def draw(self):
         if self.flag:
             self.text = get_font(self.font).render(self.text, True, self.color)
-            print(self.text)
             self.rect = self.text.get_rect(center=self.position)
             self.screen.blit(self.text, self.rect)
             self.flag = False

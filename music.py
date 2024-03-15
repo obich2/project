@@ -29,6 +29,11 @@ class Game_Music:
         self.music_sound = pygame.mixer.Sound(music_dict['menu'])
         self.effects_sound = ''
         self.sounds = [self.voicer_sound, self.music_sound, self.effects_sound]
+        self.voicer_volume = 0.5
+        self.music_volume = 0.5
+        self.effects_volume = 0.5
+        for i in self.sounds[:-1]:
+            i.set_volume(0.5)
 
     def change_sound(self, sound, sound_name):
         if sound == 'music':
@@ -46,8 +51,10 @@ class Game_Music:
 
     def play(self, sound, times):
         if sound == 'music':
+            self.music_sound.set_volume(self.music_volume)
             self.music_sound.play(times)
         elif sound == 'voicer':
+            self.voicer_sound.set_volume(self.voicer_volume)
             self.voicer_sound.play(times)
         else:
             self.effects_sound.play(times)
@@ -60,6 +67,14 @@ class Game_Music:
         else:
             self.effects_sound.stop()
 
-    def change_volume(self, volume):
-        for sound in self.sounds:
-            sound.set_volume(volume)
+    def change_volume(self, sound, volume):
+        if sound == 'music':
+            self.music_volume = volume
+            self.music_sound.set_volume(volume)
+        elif sound == 'voicer':
+            self.voicer_volume = volume
+            self.voicer_sound.set_volume(volume)
+        else:
+            self.effects_volume = volume
+            self.effects_sound.set_volume(volume)
+        print(self.music_volume, self.effects_volume, self.voicer_volume)
