@@ -162,8 +162,8 @@ def play():
     pygame.time.set_timer(pygame.USEREVENT, 1000)
     display.fill((146, 244, 255))
     # создаем героя по (x,y) координатам
-    hero_1 = Character(400, 100, 'red')
-    hero_2 = Character(1120, 100, 'blue')
+    hero_1 = Character(400, 820, 'red')
+    hero_2 = Character(1120, 820, 'blue')
     hero_1_other = []
     hero_2_other = []
     left_1 = right_1 = False  # по умолчанию - стоим
