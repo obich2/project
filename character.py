@@ -19,9 +19,9 @@ class Character(sprite.Sprite):
         self.V_y = 0  # скорость вертикального перемещения
         self.onGround = False  # опирается ли на что-то персоонаж
         self.rect = Rect(x, y, WIDTH, HEIGHT)  # прямоугольный объект
-        self.image_player = pygame.image.load('tiles/body_' + color + '.png').convert_alpha()
-        # self.image_player_b = pygame.image.load('tiles/body_bomb_' + color + '.png').convert_alpha()
-        self.image = self.image_player
+        self.image = pygame.image.load('tiles/body_' + color + '.png').convert_alpha()
+        self.right = self.image
+        self.left = pygame.transform.flip(self.image, True, False)
         self.rect_other = Rect(x, y, WIDTH, HEIGHT)
         self.color = color
 
@@ -33,9 +33,11 @@ class Character(sprite.Sprite):
 
         if left:
             self.V_x = -MOVE_SPEED  # Лево = x- n
+            self.image = self.left
 
         if right:
             self.V_x = MOVE_SPEED  # Право = x + n
+            self.image = self.right
 
         if not (left or right):  # стоим, когда нет указаний идти
             self.V_x = 0
