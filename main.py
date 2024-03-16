@@ -242,13 +242,16 @@ class Game:
             else:
                 game_running = False
                 self.game_music.stop('music')
-                if len(hero_1_other) > len(hero_2_other):
+                if len(hero_1_other) < len(hero_2_other):
                     sc.fill('black')
                     self.game_music.change_sound('voicer', 'pink_win')
                     self.game_music.play('voicer', 1)
-                    timer_text = TextLine(sc, 100, 'RED WIN', (800, 450), 'RED')
+                    timer_text = TextLine(sc, 100, 'PINK WIN', (800, 450), 'RED')
                     timer_text.draw()
                     pg.display.update()
+                    time.sleep(2)
+                    pg.display.update()
+                    self.game_music.stop('voicer')
                 elif len(hero_2_other) > len(hero_1_other):
                     self.game_music.change_sound('voicer', 'blue_win')
                     self.game_music.play('voicer', 1)
@@ -256,6 +259,8 @@ class Game:
                     timer_text = TextLine(sc, 100, 'BLUE WIN', (800, 450), 'BLUE')
                     timer_text.draw()
                     pg.display.update()
+                    time.sleep(2)
+                    self.game_music.stop('voicer')
                 elif len(hero_2_other) == len(hero_1_other):
                     self.game_music.change_sound('voicer', 'draw')
                     self.game_music.play('voicer', 1)
@@ -266,7 +271,6 @@ class Game:
                     time.sleep(1)
                     self.game_music.stop('voicer')
                     self.main_menu()
-
 
     def settings(self):
         sc = self.sc
@@ -323,17 +327,17 @@ class Game:
 
     def leaderboards(self):
         cur = self.con.cursor()
-        result = cur.execute("""SELECT score FROM stats""").fetchall()
-        print(result)
+        result = sorted([i[0] for i in cur.execute("""SELECT score FROM stats""").fetchall()], reverse=True)
         sc = self.sc
         while True:
             sc.fill('BLACK')
-            textlines = [TextLine(sc, 46, '10', (1150, 460), '#d7fcd4'),
-                         TextLine(sc, 46, '10', (1150, 560), '#d7fcd4'),
+            textlines = [TextLine(sc, 46, str(result[0]), (1150, 340), '#d7fcd4'),
+                         TextLine(sc, 46, str(result[1]), (1150, 440), '#d7fcd4'),
+                         TextLine(sc, 46, str(result[2]), (1150, 540), '#d7fcd4'),
                          TextLine(sc, 75, 'LEADERBOARDS', (800, 200), '#d7fcd4'),
-                         TextLine(sc, 46, 'first record', (400, 300), '#d7fcd4'),
-                         TextLine(sc, 46, 'second record', (400, 400), '#d7fcd4'),
-                         TextLine(sc, 46, 'third record', (400, 500), '#d7fcd4'),
+                         TextLine(sc, 46, 'first record', (600, 340), '#d7fcd4'),
+                         TextLine(sc, 46, 'second record', (600, 440), '#d7fcd4'),
+                         TextLine(sc, 46, 'third record', (600, 540), '#d7fcd4'),
                          ]
             mouse_pos = pygame.mouse.get_pos()
             mouse = pygame.mouse.get_pressed()
