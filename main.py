@@ -242,16 +242,13 @@ class Game:
             else:
                 game_running = False
                 self.game_music.stop('music')
-                if len(hero_1_other) < len(hero_2_other):
+                if len(hero_1_other) > len(hero_2_other):
                     sc.fill('black')
                     self.game_music.change_sound('voicer', 'pink_win')
                     self.game_music.play('voicer', 1)
-                    timer_text = TextLine(sc, 100, 'PINK WIN', (800, 450), 'RED')
+                    timer_text = TextLine(sc, 100, 'RED WIN', (800, 450), 'RED')
                     timer_text.draw()
                     pg.display.update()
-                    time.sleep(2)
-                    pg.display.update()
-                    self.game_music.stop('voicer')
                 elif len(hero_2_other) > len(hero_1_other):
                     self.game_music.change_sound('voicer', 'blue_win')
                     self.game_music.play('voicer', 1)
@@ -259,8 +256,6 @@ class Game:
                     timer_text = TextLine(sc, 100, 'BLUE WIN', (800, 450), 'BLUE')
                     timer_text.draw()
                     pg.display.update()
-                    time.sleep(2)
-                    self.game_music.stop('voicer')
                 elif len(hero_2_other) == len(hero_1_other):
                     self.game_music.change_sound('voicer', 'draw')
                     self.game_music.play('voicer', 1)
