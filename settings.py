@@ -5,7 +5,6 @@ HEIGHT = 9000
 MUSIC_VOLUME = 1
 EFFECTS_VOLUME = 0.1
 
-
 # def change_volume(music, effects):
 #     global MUSIC_VOLUME, EFFECTS_VOLUME
 #     MUSIC_VOLUME = music
@@ -32,6 +31,7 @@ game_map = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
             [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
+
 
 def level(row, column, value):
     global game_map

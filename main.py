@@ -134,12 +134,13 @@ class Game:
 
         # создание таймера на 1 секунду
         clock = pygame.time.Clock()
-        counter = 10
+        counter = 15
+        FPS = 60
         pygame.time.set_timer(pygame.USEREVENT, 1000)
         display.fill((146, 244, 255))
         # создаем героя по (x,y) координатам
-        hero_1 = Character(200, 100, 'red')
-        hero_2 = Character(1400, 100, 'blue')
+        hero_1 = Character(400, 820, 'red')
+        hero_2 = Character(1120, 820, 'blue')
         hero_1_other = []
         hero_2_other = []
         left_1 = right_1 = False  # по умолчанию - стоим
@@ -148,16 +149,40 @@ class Game:
         entities = pygame.sprite.Group()  # Поверхности(стенки, пол и тд)
         platforms = []  # поверхность
         other = []
+        level = game_map
+
+        y = 0
+        for row in level:
+            # print(row)
+            x = 0
+            for tile in row:
+                if tile == 1:
+                    pf = Platform(x * 80, y * 45)
+                    entities.add(pf)
+                    platforms.append(pf)
+                elif tile == 0:
+                    pf = Platform(x * 80, y * 45)
+                    entities.add(pf)
+                    other.append(pf)
+                if tile == 2:
+                    pf = Platform(x * 80, y * 45)
+                    entities.add(pf)
+                    platforms.append(pf)
+                if tile == 3:
+                    pf = Platform(x * 80, y * 45)
+                    entities.add(pf)
+                    platforms.append(pf)
+                x += 1
+            y += 1
 
         entities.add(hero_1)
         entities.add(hero_2)
         display.fill((146, 244, 255))
-        game_running = True
-        while game_running:
+        while True:
             f = pygame.font.Font(None, 40)
-            timer_text = f.render(str(counter), True,
-                                  (255, 255, 255))
-            display.blit(timer_text, (800, 800))
+            timer = f.render(str(counter), True,
+                             (255, 255, 255))
+            display.blit(timer, (800, 800))
             mouse_pos = pygame.mouse.get_pos()
             for event in pygame.event.get():
 
@@ -168,29 +193,23 @@ class Game:
                     x = 0
                     for tile in row:
                         if tile == 1:
-                            pf = Platform(x * 80, y * 45)
-                            entities.add(pf)
-                            platforms.append(pf)
                             display.blit(block_image, (x * 80, y * 45))
                         elif tile == 0:
                             display.blit(sky_image, (x * 80, y * 45))
                         if tile == 2:
-                            pf = Platform(x * 80, y * 45)
-                            entities.add(pf)
-                            platforms.append(pf)
                             display.blit(round_out, (x * 80, y * 45))
                         if tile == 3:
-                            pf = Platform(x * 80, y * 45)
-                            entities.add(pf)
-                            platforms.append(pf)
                             display.blit(rotated_round_out, (x * 80, y * 45))
-
+                        if tile == 'b':
+                            display.blit(image_trace_blue, (x * 80, y * 45))
+                        if tile == 'r':
+                            display.blit(image_trace_red, (x * 80, y * 45))
                         x += 1
                     y += 1
-                for i in hero_1_other:
-                    display.blit(image_trace_red, (i[0], i[1]))
-                for i in hero_2_other:
-                    display.blit(image_trace_blue, (i[0], i[1]))
+                # print('--------------------------------')
+                # for i in game_map:
+                #     print(i)
+                # print('--------------------------------')
                 if event.type == pygame.USEREVENT:
                     counter -= 1
                 if event.type == pygame.QUIT:
@@ -227,36 +246,46 @@ class Game:
                 if event.type == KEYUP and event.key == K_a:
                     left_2 = False
             if counter > 0:
-                r1 = hero_1.draw_other()
-                r2 = hero_2.draw_other()
-                if r1 not in hero_1_other:
-                    hero_1_other.append(r1)
-                if r2 not in hero_2_other:
-                    hero_2_other.append(r2)
+                # hero_1.draw_other('r')
+                # hero_2.draw_other('b')
                 sc.blit(display, (0, 0))
-                hero_1.update(left_1, right_1, up_1, platforms, other)  # отображение
-                hero_2.update(left_2, right_2, up_2, platforms, other)
+                hero_1.update(left_1, right_1, up_1, platforms, other, 'r')  # отображение
+                hero_2.update(left_2, right_2, up_2, platforms, other, 'b')
                 hero_1.draw(sc)
                 hero_2.draw(sc)
                 pygame.display.update()
             else:
+                blue, red = 0, 0
+                for row in level:
+                    for tile in row:
+                        if tile == 'r':
+                            red += 1
+                        elif tile == 'b':
+                            blue += 1
                 game_running = False
                 self.game_music.stop('music')
-                if len(hero_1_other) > len(hero_2_other):
+                if blue < red:
                     sc.fill('black')
                     self.game_music.change_sound('voicer', 'pink_win')
                     self.game_music.play('voicer', 1)
-                    timer_text = TextLine(sc, 100, 'RED WIN', (800, 450), 'RED')
+                    timer_text = TextLine(sc, 100, 'PINK WINS', (800, 450), 'PINK')
                     timer_text.draw()
                     pg.display.update()
-                elif len(hero_2_other) > len(hero_1_other):
+                    time.sleep(1.8)
+                    pg.display.update()
+                    self.game_music.stop('voicer')
+                    self.main_menu()
+                elif blue > red:
                     self.game_music.change_sound('voicer', 'blue_win')
                     self.game_music.play('voicer', 1)
                     sc.fill('black')
-                    timer_text = TextLine(sc, 100, 'BLUE WIN', (800, 450), 'BLUE')
+                    timer_text = TextLine(sc, 100, 'BLUE WINS', (800, 450), 'BLUE')
                     timer_text.draw()
                     pg.display.update()
-                elif len(hero_2_other) == len(hero_1_other):
+                    time.sleep(3)
+                    self.game_music.stop('voicer')
+                    self.main_menu()
+                elif blue == red:
                     self.game_music.change_sound('voicer', 'draw')
                     self.game_music.play('voicer', 1)
                     sc.fill('black')
@@ -313,6 +342,9 @@ class Game:
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
+                    for index, slider in enumerate(sliders):
+                        if slider.slider_rect.collidepoint(mouse_pos) and mouse[0]:
+                            slider.move_slider(mouse_pos)
                     if back_button.check_click(mouse_pos):
                         self.main_menu()
                     if apply_button.check_click(mouse_pos):
