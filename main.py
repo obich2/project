@@ -179,6 +179,7 @@ class Game:
         entities.add(hero_2)
         display.fill((146, 244, 255))
         while True:
+            clock.tick(FPS)
             f = pygame.font.Font(None, 40)
             timer = f.render(str(counter), True,
                              (255, 255, 255))

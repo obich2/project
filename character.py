@@ -3,10 +3,11 @@ from pygame import *
 import os
 from settings import *
 
-MOVE_SPEED = 3
+FPS = 60
+MOVE_SPEED = 300 // FPS
 WIDTH = 80
 HEIGHT = 40
-JUMP_POWER = 12
+JUMP_POWER = 800 // FPS
 GRAVITY = 0.35  # Сила, которая будет тянуть нас вниз
 
 
