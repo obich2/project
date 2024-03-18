@@ -71,23 +71,18 @@ class Character(sprite.Sprite):
                 if V_y < 0:  # прыжок
                     self.rect.top = p.rect.bottom
                     self.V_y = 0
+        # for i in other:
+        #     if sprite.collide_rect(self, i):  # столкновение с объектами
+        #         self.rect_other.left = i.rect.left
+        #         self.rect_other.top = i.rect.top
+        #         level(int(self.rect_other.top) // 45, int(self.rect_other.left) // 80, color)
+                
+    def level_update(self, other):
         for i in other:
             if sprite.collide_rect(self, i):  # столкновение с объектами
                 self.rect_other.left = i.rect.left
                 self.rect_other.top = i.rect.top
-                level(int(self.rect_other.top) // 45, int(self.rect_other.left) // 80, color)
-
-    def collide_bomb(self, bomb):
-        if sprite.collide_rect(self, bomb):
-            self.image = self.image_player_b
-            return True
-        else:
-            self.image = self.image_player
-            return False
+                return [int(self.rect_other.top) // 45, int(self.rect_other.left) // 80]
 
     def draw(self, screen):  # Выводим себя на экран
         screen.blit(self.image, (self.rect.x, self.rect.y))
-
-    # def draw_other(self, color):
-    #     print(int(self.rect_other.left) // 80, int(self.rect_other.top) // 45)
-    #     level(int(self.rect_other.left) // 80, int(self.rect_other.top) // 45, color)

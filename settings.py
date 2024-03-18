@@ -33,6 +33,12 @@ game_map = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
 
 
-def level(row, column, value):
-    global game_map
-    game_map[row][column] = value
+# def level(row, column, value):
+#     global game_map
+#     game_map[row][column] = value
+
+# def default():
+#     global game_map
+#     game_map = []
+#     for i in open("level.csv"):
+#         game_map.append(list(map(int, i.split(', '))))

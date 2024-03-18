@@ -141,16 +141,17 @@ class Game:
         # создаем героя по (x,y) координатам
         hero_1 = Character(400, 820, 'red')
         hero_2 = Character(1120, 820, 'blue')
-        hero_1_other = []
-        hero_2_other = []
         left_1 = right_1 = False  # по умолчанию - стоим
         left_2 = right_2 = False
         up_1 = up_2 = False
         entities = pygame.sprite.Group()  # Поверхности(стенки, пол и тд)
         platforms = []  # поверхность
         other = []
-        level = game_map
+        level = []
+        for i in open("level.csv"):
+            level.append(list(map(int, i.split(', '))))
 
+        
         y = 0
         for row in level:
             # print(row)
@@ -189,7 +190,7 @@ class Game:
 
                 tile_rects = []
                 y = 0
-                for row in game_map:
+                for row in level:
                     # print(row)
                     x = 0
                     for tile in row:
@@ -252,6 +253,15 @@ class Game:
                 sc.blit(display, (0, 0))
                 hero_1.update(left_1, right_1, up_1, platforms, other, 'r')  # отображение
                 hero_2.update(left_2, right_2, up_2, platforms, other, 'b')
+                red_colide = hero_1.level_update(other)
+                blue_colide = hero_2.level_update(other)
+                if red_colide != None:
+                    level[red_colide[0]][red_colide[1]] = 'r'
+                    print(level[red_colide[0]][red_colide[1]])
+                if blue_colide != None:
+                    print(level[red_colide[0]][red_colide[1]])
+                    level[blue_colide[0]][blue_colide[1]] = 'b'
+                    print(level[blue_colide[0]][blue_colide[1]])
                 hero_1.draw(sc)
                 hero_2.draw(sc)
                 pygame.display.update()
