@@ -6,9 +6,9 @@ import pygame.display
 import time
 import sqlite3
 import sys
-from button import Button
-from slider import Slider
-from textline import TextLine, get_font
+from ui.button import Button
+from ui.slider import Slider
+from ui.textline import TextLine, get_font
 from music import Game_Music
 from random import choice
 
@@ -135,7 +135,7 @@ class Game:
 
         # создание таймера на 1 секунду
         clock = pygame.time.Clock()
-        counter = 15
+        counter = 30
         FPS = 60
         pygame.time.set_timer(pygame.USEREVENT, 1000)
         display.fill((146, 244, 255))
@@ -151,6 +151,7 @@ class Game:
         level = []
         for i in open("maps/level_" + str(choice([1, 2, 3])) + ".csv"):
             level.append(list(map(int, i.split(', '))))
+        counter_for_db = 0
 
         
         y = 0
@@ -163,6 +164,7 @@ class Game:
                     entities.add(pf)
                     platforms.append(pf)
                 elif tile == 0:
+                    counter_for_db += 1
                     pf = Platform(x * 80, y * 45)
                     entities.add(pf)
                     other.append(pf)
@@ -221,29 +223,30 @@ class Game:
                 if event.type == pygame.K_ESCAPE:
                     self.game_music.stop('music')
                     self.main_menu()
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    self.game_music.stop('music')
-                    self.main_menu()
                 if event.type == KEYDOWN and event.key == K_UP:
                     up_1 = True
+                    self.game_music.play('effects', -1)
                 if event.type == KEYDOWN and event.key == K_LEFT:
                     left_1 = True
                 if event.type == KEYDOWN and event.key == K_RIGHT:
                     right_1 = True
                 if event.type == KEYUP and event.key == K_UP:
                     up_1 = False
+                    self.game_music.stop('effects')
                 if event.type == KEYUP and event.key == K_RIGHT:
                     right_1 = False
                 if event.type == KEYUP and event.key == K_LEFT:
                     left_1 = False
                 if event.type == KEYDOWN and event.key == K_w:
                     up_2 = True
+                    self.game_music.play('effects', -1)
                 if event.type == KEYDOWN and event.key == K_a:
                     left_2 = True
                 if event.type == KEYDOWN and event.key == K_d:
                     right_2 = True
                 if event.type == KEYUP and event.key == K_w:
                     up_2 = False
+                    self.game_music.stop('effects')
                 if event.type == KEYUP and event.key == K_d:
                     right_2 = False
                 if event.type == KEYUP and event.key == K_a:
@@ -258,15 +261,13 @@ class Game:
                 blue_colide = hero_2.level_update(other)
                 if red_colide != None:
                     level[red_colide[0]][red_colide[1]] = 'r'
-                    print(level[red_colide[0]][red_colide[1]])
                 if blue_colide != None:
-                    print(level[red_colide[0]][red_colide[1]])
                     level[blue_colide[0]][blue_colide[1]] = 'b'
-                    print(level[blue_colide[0]][blue_colide[1]])
                 hero_1.draw(sc)
                 hero_2.draw(sc)
                 pygame.display.update()
             else:
+                self.game_music.stop('effects')
                 blue, red = 0, 0
                 for row in level:
                     for tile in row:
@@ -276,6 +277,12 @@ class Game:
                             blue += 1
                 game_running = False
                 self.game_music.stop('music')
+                max_result = round(max(red, blue) / counter_for_db * 100)
+                cur = self.con.cursor()
+                cur.execute('INSERT INTO stats(score) VALUES(?)', (max_result,))
+                self.con.commit()
+                cur.close()
+
                 if blue < red:
                     sc.fill('black')
                     self.game_music.change_sound('voicer', 'pink_win')
@@ -308,6 +315,7 @@ class Game:
                     self.game_music.stop('voicer')
                     self.main_menu()
 
+
     def settings(self):
         sc = self.sc
         sc.fill('BLACK')
@@ -339,8 +347,6 @@ class Game:
             apply_button.change_color(mouse_pos)
             apply_button.update(sc)
             for index, slider in enumerate(sliders):
-                if slider.slider_rect.collidepoint(mouse_pos) and mouse[0]:
-                    slider.move_slider(mouse_pos)
                 slider.draw(sc)
                 current_textline = textlines[index]
                 current_textline.change_text(str(int(slider.get_value() // 1)))
@@ -354,9 +360,19 @@ class Game:
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+                    mouse = pygame.mouse.get_pressed()
                     for index, slider in enumerate(sliders):
                         if slider.slider_rect.collidepoint(mouse_pos) and mouse[0]:
                             slider.move_slider(mouse_pos)
+                        slider.draw(sc)
+                        current_textline = textlines[index]
+                        current_textline.change_text(str(int(slider.get_value() // 1)))
+                        current_textline.value = int(slider.get_value() // 1)
+                        sc.fill('black',
+                                (current_textline.position[0] - 75, current_textline.position[1] - 30, 150, 75))
+                        current_textline.draw()
+                    pygame.display.update()
                     if back_button.check_click(mouse_pos):
                         self.main_menu()
                     if apply_button.check_click(mouse_pos):
