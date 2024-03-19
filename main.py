@@ -10,6 +10,7 @@ from button import Button
 from slider import Slider
 from textline import TextLine, get_font
 from music import Game_Music
+from random import choice
 
 sc = pg.display.set_mode((1600, 900))
 display = pg.Surface((1600, 900))
@@ -148,7 +149,7 @@ class Game:
         platforms = []  # поверхность
         other = []
         level = []
-        for i in open("level.csv"):
+        for i in open("maps/level_" + str(choice([1, 2, 3])) + ".csv"):
             level.append(list(map(int, i.split(', '))))
 
         
