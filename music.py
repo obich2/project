@@ -17,7 +17,7 @@ voicer_dict = {
 }
 
 effects_dict = {
-
+    'jump': 'sound/Effects/jump.mp3'
 }
 
 
@@ -27,7 +27,7 @@ class Game_Music:
         # default sounds
         self.voicer_sound = pygame.mixer.Sound(voicer_dict['game_title'])
         self.music_sound = pygame.mixer.Sound(music_dict['menu'])
-        self.effects_sound = ''
+        self.effects_sound = pygame.mixer.Sound(effects_dict['jump'])
         self.sounds = [self.voicer_sound, self.music_sound, self.effects_sound]
         self.voicer_volume = 0.5
         self.music_volume = 0.5
@@ -44,7 +44,7 @@ class Game_Music:
         elif sound == "voicer":
             self.voicer_sound = pygame.mixer.Sound(voicer_dict[sound_name])
         else:
-            self.effects_sound = pygame.mixer.Sound('')
+            self.effects_sound = pygame.mixer.Sound(effects_dict[sound_name])
 
     def change_voicer(self):
         self.music_sound = pygame.mixer.Sound('')
@@ -77,4 +77,3 @@ class Game_Music:
         else:
             self.effects_volume = volume
             self.effects_sound.set_volume(volume)
-        print(self.music_volume, self.effects_volume, self.voicer_volume)

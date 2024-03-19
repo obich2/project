@@ -1,0 +1,4 @@
+
+Игра для нескольких игроков. Можно играть, как по сети, так и на одном пк. Как минимум одна мини игра с соревновательным режимом и одним победителем. 
+
+A game for several players. You can play both online and on one computer. At least one competitive mini-game with one winner.

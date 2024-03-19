@@ -1,11 +1,13 @@
 import pygame
 from pygame import *
 import os
+from settings import *
 
-MOVE_SPEED = 7
+FPS = 60
+MOVE_SPEED = 300 // FPS
 WIDTH = 80
 HEIGHT = 40
-JUMP_POWER = 10
+JUMP_POWER = 800 // FPS
 GRAVITY = 0.35  # Сила, которая будет тянуть нас вниз
 
 
@@ -18,10 +20,13 @@ class Character(sprite.Sprite):
         self.V_y = 0  # скорость вертикального перемещения
         self.onGround = False  # опирается ли на что-то персоонаж
         self.rect = Rect(x, y, WIDTH, HEIGHT)  # прямоугольный объект
-        self.image_player = pygame.image.load('tiles/body_' + color + '.png').convert_alpha()
+        self.image = pygame.image.load('tiles/body_' + color + '.png').convert_alpha()
+        self.right = self.image
+        self.left = pygame.transform.flip(self.image, True, False)
         self.rect_other = Rect(x, y, WIDTH, HEIGHT)
+        self.color = color
 
-    def update(self, left, right, up, platforms, other):
+    def update(self, left, right, up, platforms, other, color):
 
         if up:  # прыжок
             if self.onGround:  # проверка на соприкосновение с поверхностью
@@ -29,9 +34,11 @@ class Character(sprite.Sprite):
 
         if left:
             self.V_x = -MOVE_SPEED  # Лево = x- n
+            self.image = self.left
 
         if right:
             self.V_x = MOVE_SPEED  # Право = x + n
+            self.image = self.right
 
         if not (left or right):  # стоим, когда нет указаний идти
             self.V_x = 0
@@ -41,12 +48,12 @@ class Character(sprite.Sprite):
 
         self.onGround = False;  # Мы не знаем, когда мы на земле
         self.rect.y += self.V_y
-        self.collide(0, self.V_y, platforms, other)
+        self.collide(0, self.V_y, platforms, other, color)
 
         self.rect.x += self.V_x  # переносим положение на V_x
-        self.collide(self.V_x, 0, platforms, other)
+        self.collide(self.V_x, 0, platforms, other, color)
 
-    def collide(self, V_x, V_y, platforms, other):
+    def collide(self, V_x, V_y, platforms, other, color):
         for p in platforms:
             if sprite.collide_rect(self, p):  # столкновение с объектами
 
@@ -64,13 +71,18 @@ class Character(sprite.Sprite):
                 if V_y < 0:  # прыжок
                     self.rect.top = p.rect.bottom
                     self.V_y = 0
+        # for i in other:
+        #     if sprite.collide_rect(self, i):  # столкновение с объектами
+        #         self.rect_other.left = i.rect.left
+        #         self.rect_other.top = i.rect.top
+        #         level(int(self.rect_other.top) // 45, int(self.rect_other.left) // 80, color)
+                
+    def level_update(self, other):
         for i in other:
             if sprite.collide_rect(self, i):  # столкновение с объектами
                 self.rect_other.left = i.rect.left
                 self.rect_other.top = i.rect.top
+                return [int(self.rect_other.top) // 45, int(self.rect_other.left) // 80]
 
     def draw(self, screen):  # Выводим себя на экран
-        screen.blit(self.image_player, (self.rect.x, self.rect.y))
-        
-    def draw_other(self):
-        return [self.rect_other.left, self.rect_other.top]
+        screen.blit(self.image, (self.rect.x, self.rect.y))

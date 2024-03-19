@@ -6,10 +6,11 @@ import pygame.display
 import time
 import sqlite3
 import sys
-from button import Button
-from slider import Slider
-from textline import TextLine, get_font
+from ui.button import Button
+from ui.slider import Slider
+from ui.textline import TextLine, get_font
 from music import Game_Music
+from random import choice
 
 sc = pg.display.set_mode((1600, 900))
 display = pg.Surface((1600, 900))
@@ -134,63 +135,86 @@ class Game:
 
         # создание таймера на 1 секунду
         clock = pygame.time.Clock()
-        counter = 10
+        counter = 30
+        FPS = 60
         pygame.time.set_timer(pygame.USEREVENT, 1000)
         display.fill((146, 244, 255))
         # создаем героя по (x,y) координатам
-        hero_1 = Character(200, 100, 'red')
-        hero_2 = Character(1400, 100, 'blue')
-        hero_1_other = []
-        hero_2_other = []
+        hero_1 = Character(400, 820, 'red')
+        hero_2 = Character(1120, 820, 'blue')
         left_1 = right_1 = False  # по умолчанию - стоим
         left_2 = right_2 = False
         up_1 = up_2 = False
         entities = pygame.sprite.Group()  # Поверхности(стенки, пол и тд)
         platforms = []  # поверхность
         other = []
+        level = []
+        for i in open("maps/level_" + str(choice([1, 2, 3])) + ".csv"):
+            level.append(list(map(int, i.split(', '))))
+        counter_for_db = 0
+
+        
+        y = 0
+        for row in level:
+            # print(row)
+            x = 0
+            for tile in row:
+                if tile == 1:
+                    pf = Platform(x * 80, y * 45)
+                    entities.add(pf)
+                    platforms.append(pf)
+                elif tile == 0:
+                    counter_for_db += 1
+                    pf = Platform(x * 80, y * 45)
+                    entities.add(pf)
+                    other.append(pf)
+                if tile == 2:
+                    pf = Platform(x * 80, y * 45)
+                    entities.add(pf)
+                    platforms.append(pf)
+                if tile == 3:
+                    pf = Platform(x * 80, y * 45)
+                    entities.add(pf)
+                    platforms.append(pf)
+                x += 1
+            y += 1
 
         entities.add(hero_1)
         entities.add(hero_2)
         display.fill((146, 244, 255))
-        game_running = True
-        while game_running:
+        while True:
+            clock.tick(FPS)
             f = pygame.font.Font(None, 40)
-            timer_text = f.render(str(counter), True,
-                                  (255, 255, 255))
-            display.blit(timer_text, (800, 800))
+            timer = f.render(str(counter), True,
+                             (255, 255, 255))
+            display.blit(timer, (800, 800))
             mouse_pos = pygame.mouse.get_pos()
             for event in pygame.event.get():
 
                 tile_rects = []
                 y = 0
-                for row in game_map:
+                for row in level:
                     # print(row)
                     x = 0
                     for tile in row:
                         if tile == 1:
-                            pf = Platform(x * 80, y * 45)
-                            entities.add(pf)
-                            platforms.append(pf)
                             display.blit(block_image, (x * 80, y * 45))
                         elif tile == 0:
                             display.blit(sky_image, (x * 80, y * 45))
                         if tile == 2:
-                            pf = Platform(x * 80, y * 45)
-                            entities.add(pf)
-                            platforms.append(pf)
                             display.blit(round_out, (x * 80, y * 45))
                         if tile == 3:
-                            pf = Platform(x * 80, y * 45)
-                            entities.add(pf)
-                            platforms.append(pf)
                             display.blit(rotated_round_out, (x * 80, y * 45))
-
+                        if tile == 'b':
+                            display.blit(image_trace_blue, (x * 80, y * 45))
+                        if tile == 'r':
+                            display.blit(image_trace_red, (x * 80, y * 45))
                         x += 1
                     y += 1
-                for i in hero_1_other:
-                    display.blit(image_trace_red, (i[0], i[1]))
-                for i in hero_2_other:
-                    display.blit(image_trace_blue, (i[0], i[1]))
+                # print('--------------------------------')
+                # for i in game_map:
+                #     print(i)
+                # print('--------------------------------')
                 if event.type == pygame.USEREVENT:
                     counter -= 1
                 if event.type == pygame.QUIT:
@@ -199,69 +223,88 @@ class Game:
                 if event.type == pygame.K_ESCAPE:
                     self.game_music.stop('music')
                     self.main_menu()
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    self.game_music.stop('music')
-                    self.main_menu()
                 if event.type == KEYDOWN and event.key == K_UP:
                     up_1 = True
+                    self.game_music.play('effects', -1)
                 if event.type == KEYDOWN and event.key == K_LEFT:
                     left_1 = True
                 if event.type == KEYDOWN and event.key == K_RIGHT:
                     right_1 = True
                 if event.type == KEYUP and event.key == K_UP:
                     up_1 = False
+                    self.game_music.stop('effects')
                 if event.type == KEYUP and event.key == K_RIGHT:
                     right_1 = False
                 if event.type == KEYUP and event.key == K_LEFT:
                     left_1 = False
                 if event.type == KEYDOWN and event.key == K_w:
                     up_2 = True
+                    self.game_music.play('effects', -1)
                 if event.type == KEYDOWN and event.key == K_a:
                     left_2 = True
                 if event.type == KEYDOWN and event.key == K_d:
                     right_2 = True
                 if event.type == KEYUP and event.key == K_w:
                     up_2 = False
+                    self.game_music.stop('effects')
                 if event.type == KEYUP and event.key == K_d:
                     right_2 = False
                 if event.type == KEYUP and event.key == K_a:
                     left_2 = False
             if counter > 0:
-                r1 = hero_1.draw_other()
-                r2 = hero_2.draw_other()
-                if r1 not in hero_1_other:
-                    hero_1_other.append(r1)
-                if r2 not in hero_2_other:
-                    hero_2_other.append(r2)
+                # hero_1.draw_other('r')
+                # hero_2.draw_other('b')
                 sc.blit(display, (0, 0))
-                hero_1.update(left_1, right_1, up_1, platforms, other)  # отображение
-                hero_2.update(left_2, right_2, up_2, platforms, other)
+                hero_1.update(left_1, right_1, up_1, platforms, other, 'r')  # отображение
+                hero_2.update(left_2, right_2, up_2, platforms, other, 'b')
+                red_colide = hero_1.level_update(other)
+                blue_colide = hero_2.level_update(other)
+                if red_colide != None:
+                    level[red_colide[0]][red_colide[1]] = 'r'
+                if blue_colide != None:
+                    level[blue_colide[0]][blue_colide[1]] = 'b'
                 hero_1.draw(sc)
                 hero_2.draw(sc)
                 pygame.display.update()
             else:
+                self.game_music.stop('effects')
+                blue, red = 0, 0
+                for row in level:
+                    for tile in row:
+                        if tile == 'r':
+                            red += 1
+                        elif tile == 'b':
+                            blue += 1
                 game_running = False
                 self.game_music.stop('music')
-                if len(hero_1_other) < len(hero_2_other):
+                max_result = round(max(red, blue) / counter_for_db * 100)
+                cur = self.con.cursor()
+                cur.execute('INSERT INTO stats(score) VALUES(?)', (max_result,))
+                self.con.commit()
+                cur.close()
+
+                if blue < red:
                     sc.fill('black')
                     self.game_music.change_sound('voicer', 'pink_win')
                     self.game_music.play('voicer', 1)
-                    timer_text = TextLine(sc, 100, 'PINK WIN', (800, 450), 'RED')
+                    timer_text = TextLine(sc, 100, 'PINK WINS', (800, 450), 'PINK')
                     timer_text.draw()
                     pg.display.update()
-                    time.sleep(2)
+                    time.sleep(1.8)
                     pg.display.update()
                     self.game_music.stop('voicer')
-                elif len(hero_2_other) > len(hero_1_other):
+                    self.main_menu()
+                elif blue > red:
                     self.game_music.change_sound('voicer', 'blue_win')
                     self.game_music.play('voicer', 1)
                     sc.fill('black')
-                    timer_text = TextLine(sc, 100, 'BLUE WIN', (800, 450), 'BLUE')
+                    timer_text = TextLine(sc, 100, 'BLUE WINS', (800, 450), 'BLUE')
                     timer_text.draw()
                     pg.display.update()
-                    time.sleep(2)
+                    time.sleep(3)
                     self.game_music.stop('voicer')
-                elif len(hero_2_other) == len(hero_1_other):
+                    self.main_menu()
+                elif blue == red:
                     self.game_music.change_sound('voicer', 'draw')
                     self.game_music.play('voicer', 1)
                     sc.fill('black')
@@ -271,6 +314,7 @@ class Game:
                     time.sleep(1)
                     self.game_music.stop('voicer')
                     self.main_menu()
+
 
     def settings(self):
         sc = self.sc
@@ -303,8 +347,6 @@ class Game:
             apply_button.change_color(mouse_pos)
             apply_button.update(sc)
             for index, slider in enumerate(sliders):
-                if slider.slider_rect.collidepoint(mouse_pos) and mouse[0]:
-                    slider.move_slider(mouse_pos)
                 slider.draw(sc)
                 current_textline = textlines[index]
                 current_textline.change_text(str(int(slider.get_value() // 1)))
@@ -318,6 +360,19 @@ class Game:
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+                    mouse = pygame.mouse.get_pressed()
+                    for index, slider in enumerate(sliders):
+                        if slider.slider_rect.collidepoint(mouse_pos) and mouse[0]:
+                            slider.move_slider(mouse_pos)
+                        slider.draw(sc)
+                        current_textline = textlines[index]
+                        current_textline.change_text(str(int(slider.get_value() // 1)))
+                        current_textline.value = int(slider.get_value() // 1)
+                        sc.fill('black',
+                                (current_textline.position[0] - 75, current_textline.position[1] - 30, 150, 75))
+                        current_textline.draw()
+                    pygame.display.update()
                     if back_button.check_click(mouse_pos):
                         self.main_menu()
                     if apply_button.check_click(mouse_pos):

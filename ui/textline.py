@@ -30,4 +30,4 @@ class TextLine:
 
 
 def get_font(size):
-    return pygame.font.Font("font.ttf", size)
+    return pygame.font.Font("ui/font.ttf", size)
